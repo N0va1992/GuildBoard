@@ -1,7 +1,9 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+    <!-- Base application night theme inheriting from values/themes.xml base -->
     <style name="Base.Theme.GuildBoard" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="colorPrimary">@color/accent_gold</item>
+        <item name="colorOnPrimary">@color/bg_dark</item>
+        <item name="android:statusBarColor">@color/surface_dark</item>
+        <item name="android:windowBackground">@color/bg_dark</item>
     </style>
 </resources>

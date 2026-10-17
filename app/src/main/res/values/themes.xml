@@ -1,9 +1,19 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.GuildBoard" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <!-- Primary brand color -->
+        <item name="colorPrimary">@color/accent_gold</item>
+        <item name="colorOnPrimary">@color/bg_dark</item>
+        <item name="android:statusBarColor">@color/surface_dark</item>
+        <item name="android:windowBackground">@color/bg_dark</item>
     </style>
 
     <style name="Theme.GuildBoard" parent="Base.Theme.GuildBoard" />
+
+    <!-- Custom dark theme wrapper for PopupMenu -->
+    <style name="CustomPopupMenuTheme" parent="ThemeOverlay.AppCompat.Dark">
+        <item name="android:colorBackground">@color/card_dark</item>
+        <item name="colorBackgroundFloating">@color/card_dark</item>
+        <item name="android:textColor">@color/text_white</item>
+    </style>
 </resources>

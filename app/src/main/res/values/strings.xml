@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">GuildBoard</string>
+    <string name="nav_games">Gry</string>
+    <string name="nav_chat">Czat</string>
+    <string name="nav_players">Gracze</string>
+    <string name="nav_profile">Profil</string>
+    <string name="menu_logout">Wyloguj się</string>
+    <string name="menu_about">Informacje o aplikacji</string>
+    <string name="menu_exit">Wyłącz aplikację</string>
+    <string name="btn_login">Zaloguj</string>
 </resources>
