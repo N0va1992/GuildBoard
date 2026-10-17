@@ -1,0 +1,14 @@
+3. GuildBoard – Organizer i tablica ogłoszeń dla lokalnych graczy planszówek / RPG
+Aplikacja łącząca graczy szukających ekipy do planszówek, sesji RPG czy miniturniejów w danym mieście lub lokalu.
+
+Co robi: Gracze tworzą wydarzenia (gra, liczba wolnych miejsc, poziom zaawansowania, lokalizacja/stół), inni wysyłają prośby o dołączenie. Po akceptacji odblokowuje się dedykowany czat i podgląd kart postaci/zasad.
+
+Sensory telefonu: GPS (filtrowanie po odległości), powiadomienia push (o dołączeniu gracza, zmianie godziny).
+
+Podział zadań:
+
+Osoba 1 (Backend & DB): Logika ról (mistrz gry/organizator, gracz), system zgłoszeń (accept/reject), model bazy danych obsługujący sesje i stan miejsc.
+
+Osoba 2 (Mobile Frontend): Karty wydarzeń, widok profilu gracza z grami, które posiada, płynne filtry wyszukiwania.
+
+Osoba 3 (Komunikacja & Real-time): Czat grupowy na WebSockets, synchronizacja statusów, integracja z zewnętrznym API (np. BoardGameGeek API do pobierania okładek i opisów gier).
