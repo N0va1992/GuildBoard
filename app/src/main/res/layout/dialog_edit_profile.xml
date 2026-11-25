@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/card_dark">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Edycja Profilu"
+            android:textColor="@color/accent_gold"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Zaktualizuj swoje dane widoczne dla innych graczy"
+            android:textColor="@color/text_muted"
+            android:textSize="12sp" />
+
+        <!-- Nick -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="Nazwa użytkownika (Nick)"
+            android:textColor="@color/text_white"
+            android:textSize="12sp" />
+
+        <EditText
+            android:id="@+id/etEditNick"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/bg_input_field"
+            android:hint="np. Jan_Gracz"
+            android:inputType="text"
+            android:padding="10dp"
+            android:textColor="@color/text_white"
+            android:textColorHint="@color/text_hint"
+            android:textSize="14sp" />
+
+        <!-- Miejscowość -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Miejscowość / Miasto"
+            android:textColor="@color/text_white"
+            android:textSize="12sp" />
+
+        <EditText
+            android:id="@+id/etEditCity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/bg_input_field"
+            android:hint="np. Kraków, Warszawa"
+            android:inputType="text"
+            android:padding="10dp"
+            android:textColor="@color/text_white"
+            android:textColorHint="@color/text_hint"
+            android:textSize="14sp" />
+
+        <!-- Rola -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Preferowana Rola"
+            android:textColor="@color/text_white"
+            android:textSize="12sp" />
+
+        <RadioGroup
+            android:id="@+id/rgEditRole"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/rbEditPlayer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="Gracz"
+                android:textColor="@color/text_white"
+                android:buttonTint="@color/accent_gold" />
+
+            <RadioButton
+                android:id="@+id/rbEditGm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:text="Mistrz Gry"
+                android:textColor="@color/text_white"
+                android:buttonTint="@color/accent_gold" />
+
+            <RadioButton
+                android:id="@+id/rbEditOrganizer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:text="Organizator"
+                android:textColor="@color/text_white"
+                android:buttonTint="@color/accent_gold" />
+        </RadioGroup>
+
+        <!-- Posiadane gry -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Posiadane / Ulubione gry"
+            android:textColor="@color/text_white"
+            android:textSize="12sp" />
+
+        <EditText
+            android:id="@+id/etEditGames"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/bg_input_field"
+            android:hint="np. Nemesis, Catan, Gloomhaven"
+            android:inputType="text"
+            android:padding="10dp"
+            android:textColor="@color/text_white"
+            android:textColorHint="@color/text_hint"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/btnSaveProfile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="@color/accent_gold"
+            android:text="Zapisz zmiany"
+            android:textColor="@color/bg_dark"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvCloseEditProfile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="12dp"
+            android:padding="8dp"
+            android:text="Anuluj"
+            android:textColor="@color/text_muted"
+            android:textSize="13sp" />
+
+    </LinearLayout>
+
+</ScrollView>

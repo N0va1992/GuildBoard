@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/card_dark"
+    android:padding="20dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="GuildBoard • O aplikacji"
+        android:textColor="@color/accent_gold"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="Wersja 1.0.0 (Build 2025)"
+        android:textColor="@color/text_muted"
+        android:textSize="12sp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="GuildBoard to organizer i tablica ogłoszeń dla lokalnych graczy planszówek oraz sesji RPG.\n\nUmożliwia tworzenie stółów, filtrowanie po odległości GPS, wyszukiwanie graczy oraz wspólny czat w czasie rzeczywistym."
+        android:textColor="@color/text_white"
+        android:textSize="13sp" />
+
+    <Button
+        android:id="@+id/btnCloseAbout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:backgroundTint="@color/accent_gold"
+        android:text="Zamknij"
+        android:textColor="@color/bg_dark"
+        android:textStyle="bold" />
+
+</LinearLayout>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_games"
+        android:icon="@drawable/ic_games"
+        android:title="@string/nav_games" />
+
+    <item
+        android:id="@+id/nav_guild"
+        android:icon="@drawable/ic_guild"
+        android:title="@string/nav_guild" />
+
+    <item
+        android:id="@+id/nav_chat"
+        android:icon="@drawable/ic_chat"
+        android:title="@string/nav_chat" />
+
+    <item
+        android:id="@+id/nav_players"
+        android:icon="@drawable/ic_players"
+        android:title="@string/nav_players" />
+
+    <item
+        android:id="@+id/nav_profile"
+        android:icon="@drawable/ic_profile"
+        android:title="@string/nav_profile" />
+</menu>

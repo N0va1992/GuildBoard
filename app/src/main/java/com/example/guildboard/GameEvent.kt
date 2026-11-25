@@ -1,0 +1,12 @@
+package com.example.guildboard
+
+data class GameEvent(
+    val id: String,
+    val title: String,
+    val description: String,
+    val distanceKm: Double,
+    val currentSeats: Int,
+    val maxSeats: Int,
+    val category: String,
+    var isJoined: Boolean = false
+)

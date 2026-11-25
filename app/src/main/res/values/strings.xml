@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">GuildBoard</string>
     <string name="nav_games">Gry</string>
+    <string name="nav_guild">Gildia</string>
     <string name="nav_chat">Czat</string>
     <string name="nav_players">Gracze</string>
     <string name="nav_profile">Profil</string>

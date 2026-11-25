@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/card_dark">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Stwórz Nową Gildię"
+            android:textColor="@color/accent_gold"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Zgromadź własną społeczność graczy planszówek lub RPG"
+            android:textColor="@color/text_muted"
+            android:textSize="12sp" />
+
+        <!-- Nazwa -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="Nazwa Gildii"
+            android:textColor="@color/text_white"
+            android:textSize="12sp" />
+
+        <EditText
+            android:id="@+id/etGuildName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/bg_input_field"
+            android:hint="np. Krakowski Klub RPG"
+            android:inputType="text"
+            android:padding="10dp"
+            android:textColor="@color/text_white"
+            android:textColorHint="@color/text_hint"
+            android:textSize="14sp" />
+
+        <!-- Miejscowość -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Miejscowość"
+            android:textColor="@color/text_white"
+            android:textSize="12sp" />
+
+        <EditText
+            android:id="@+id/etGuildCity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/bg_input_field"
+            android:hint="np. Kraków"
+            android:inputType="text"
+            android:padding="10dp"
+            android:textColor="@color/text_white"
+            android:textColorHint="@color/text_hint"
+            android:textSize="14sp" />
+
+        <!-- Opis -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Opis gildii i zasady"
+            android:textColor="@color/text_white"
+            android:textSize="12sp" />
+
+        <EditText
+            android:id="@+id/etGuildDesc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/bg_input_field"
+            android:hint="Opisz tematykę grupy, częstotliwość spotkań..."
+            android:inputType="textMultiLine"
+            android:minLines="3"
+            android:padding="10dp"
+            android:textColor="@color/text_white"
+            android:textColorHint="@color/text_hint"
+            android:textSize="14sp" />
+
+        <!-- Opcja akceptacji -->
+        <CheckBox
+            android:id="@+id/cbRequiresApproval"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Dołączenie wymaga akceptacji (Ograniczony dostęp)"
+            android:textColor="@color/text_white"
+            android:textSize="13sp"
+            android:buttonTint="@color/accent_gold" />
+
+        <Button
+            android:id="@+id/btnDoCreateGuild"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="@color/accent_gold"
+            android:text="Stwórz gildię"
+            android:textColor="@color/bg_dark"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvCloseCreateGuild"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="12dp"
+            android:padding="8dp"
+            android:text="Anuluj"
+            android:textColor="@color/text_muted"
+            android:textSize="13sp" />
+
+    </LinearLayout>
+
+</ScrollView>

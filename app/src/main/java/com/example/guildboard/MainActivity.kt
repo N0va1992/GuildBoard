@@ -1,6 +1,9 @@
 package com.example.guildboard
 
+import android.graphics.Color
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.view.ContextThemeWrapper
 import android.view.View
 import android.widget.ImageButton
@@ -21,8 +24,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvHeaderTitle: TextView
     private lateinit var bottomNavigationView: BottomNavigationView
 
-    private var currentUserNick: String = "Jan_Gracz"
-    private var isLoggedIn: Boolean = false
+    private lateinit var dbHelper: GuildBoardDbHelper
+    private var currentUser: User? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +37,8 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        dbHelper = GuildBoardDbHelper(this)
 
         btnLogin = findViewById(R.id.btnLogin)
         btnMenu = findViewById(R.id.btnMenu)
@@ -50,11 +55,15 @@ class MainActivity : AppCompatActivity() {
             showTopMenu(view)
         }
 
-        // Dolne menu nawigacyjne
+        // Dolne menu nawigacyjne z 5 zakładkami
         bottomNavigationView.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_games -> {
                     loadFragment(GamesListFragment())
+                    true
+                }
+                R.id.nav_guild -> {
+                    loadFragment(GuildsFragment())
                     true
                 }
                 R.id.nav_chat -> {
@@ -85,11 +94,19 @@ class MainActivity : AppCompatActivity() {
             .commit()
     }
 
-    // Wyświetla rozwijane menu w prawym górnym rogu z odpowiednim motywem ciemnym
+    // Wyświetla rozwijane menu w prawym górnym rogu z ciemnym tłem
     private fun showTopMenu(view: View) {
         val wrapper = ContextThemeWrapper(this, R.style.CustomPopupMenuTheme)
         val popupMenu = PopupMenu(wrapper, view)
         popupMenu.menuInflater.inflate(R.menu.top_overflow_menu, popupMenu.menu)
+
+        // Ustawienie białego koloru tekstu dla elementów menu
+        for (i in 0 until popupMenu.menu.size()) {
+            val item = popupMenu.menu.getItem(i)
+            val span = SpannableString(item.title)
+            span.setSpan(ForegroundColorSpan(Color.WHITE), 0, span.length, 0)
+            item.title = span
+        }
 
         popupMenu.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
@@ -122,30 +139,29 @@ class MainActivity : AppCompatActivity() {
         dialog.show(supportFragmentManager, AboutDialogFragment.TAG)
     }
 
-    fun performLogin(nickOrEmail: String) {
-        isLoggedIn = true
-        currentUserNick = if (nickOrEmail.contains("@")) nickOrEmail.substringBefore("@") else nickOrEmail
-        Toast.makeText(this, "Zalogowano pomyślnie jako: $currentUserNick", Toast.LENGTH_SHORT).show()
+    // Powrót z dialogu po udanym logowaniu / rejestracji
+    fun onUserAuthenticated(user: User) {
+        currentUser = user
+        Toast.makeText(this, "Zalogowano jako: ${user.nickname}", Toast.LENGTH_SHORT).show()
 
-        // Odśwież obecny fragment, jeśli wyświetlany jest Profil
+        // Odświeżenie obecnego widoku
         val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
-        if (currentFragment is ProfileFragment) {
-            loadFragment(ProfileFragment())
+        if (currentFragment != null) {
+            loadFragment(currentFragment::class.java.getDeclaredConstructor().newInstance())
         }
     }
 
     fun performLogout() {
-        if (!isLoggedIn) {
+        if (currentUser == null) {
             Toast.makeText(this, "Nie jesteś zalogowany.", Toast.LENGTH_SHORT).show()
             return
         }
-        isLoggedIn = false
-        currentUserNick = "Gość"
+        currentUser = null
         Toast.makeText(this, "Wylogowano pomyślnie.", Toast.LENGTH_SHORT).show()
 
         val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_container)
-        if (currentFragment is ProfileFragment) {
-            loadFragment(ProfileFragment())
+        if (currentFragment != null) {
+            loadFragment(currentFragment::class.java.getDeclaredConstructor().newInstance())
         }
     }
 
@@ -157,7 +173,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun getCurrentUserNick(): String = currentUserNick
+    fun getDbHelper(): GuildBoardDbHelper = dbHelper
 
-    fun isUserLoggedIn(): Boolean = isLoggedIn
+    fun getCurrentUser(): User? = currentUser
+
+    fun getCurrentUserNick(): String = currentUser?.nickname ?: "Gość"
+
+    fun isUserLoggedIn(): Boolean = currentUser != null
 }
