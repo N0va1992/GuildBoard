@@ -8,5 +8,7 @@ data class GameEvent(
     val currentSeats: Int,
     val maxSeats: Int,
     val category: String,
-    var isJoined: Boolean = false
+    var isJoined: Boolean = false,
+    val organizerId: Long = 1,
+    val organizerNick: String = "Jan_Gracz"
 )

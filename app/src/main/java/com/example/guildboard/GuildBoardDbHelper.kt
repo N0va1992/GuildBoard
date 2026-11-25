@@ -9,7 +9,7 @@ class GuildBoardDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
 
     companion object {
         private const val DATABASE_NAME = "guildboard_local.db"
-        private const val DATABASE_VERSION = 3
+        private const val DATABASE_VERSION = 4
 
         // Tabela Użytkowników
         private const val TABLE_USERS = "users"
@@ -25,7 +25,7 @@ class GuildBoardDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         private const val KEY_USER_TABLES_ORG = "tables_organized"
         private const val KEY_USER_RATING = "rating"
 
-        // Tabela Wydarzeń / Stołów
+        // Tabela Wydarzeń / Stołów (powiązana z users za pomocą organizer_id)
         private const val TABLE_EVENTS = "game_events"
         private const val KEY_EVENT_ID = "id"
         private const val KEY_EVENT_TITLE = "title"
@@ -34,6 +34,8 @@ class GuildBoardDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         private const val KEY_EVENT_CURR_SEATS = "current_seats"
         private const val KEY_EVENT_MAX_SEATS = "max_seats"
         private const val KEY_EVENT_CATEGORY = "category"
+        private const val KEY_EVENT_ORGANIZER_ID = "organizer_id"
+        private const val KEY_EVENT_ORGANIZER_NICK = "organizer_nick"
         private const val KEY_EVENT_JOINED = "is_joined"
 
         // Tabela Wiadomości Czatu Stołu
@@ -108,7 +110,10 @@ class GuildBoardDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
                 $KEY_EVENT_CURR_SEATS INTEGER,
                 $KEY_EVENT_MAX_SEATS INTEGER,
                 $KEY_EVENT_CATEGORY TEXT,
-                $KEY_EVENT_JOINED INTEGER DEFAULT 0
+                $KEY_EVENT_ORGANIZER_ID INTEGER,
+                $KEY_EVENT_ORGANIZER_NICK TEXT,
+                $KEY_EVENT_JOINED INTEGER DEFAULT 0,
+                FOREIGN KEY ($KEY_EVENT_ORGANIZER_ID) REFERENCES $TABLE_USERS($KEY_USER_ID)
             )
         """.trimIndent()
 
@@ -132,7 +137,8 @@ class GuildBoardDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
                 $KEY_GUILD_OWNER_NICK TEXT,
                 $KEY_GUILD_CITY TEXT,
                 $KEY_GUILD_REQUIRES_APPROVAL INTEGER DEFAULT 0,
-                $KEY_GUILD_MEMBER_COUNT INTEGER DEFAULT 1
+                $KEY_GUILD_MEMBER_COUNT INTEGER DEFAULT 1,
+                FOREIGN KEY ($KEY_GUILD_OWNER_ID) REFERENCES $TABLE_USERS($KEY_USER_ID)
             )
         """.trimIndent()
 
@@ -143,7 +149,9 @@ class GuildBoardDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
                 $KEY_GM_USER_ID INTEGER,
                 $KEY_GM_USER_NICK TEXT,
                 $KEY_GM_ROLE TEXT,
-                $KEY_GM_STATUS TEXT
+                $KEY_GM_STATUS TEXT,
+                FOREIGN KEY ($KEY_GM_GUILD_ID) REFERENCES $TABLE_GUILDS($KEY_GUILD_ID),
+                FOREIGN KEY ($KEY_GM_USER_ID) REFERENCES $TABLE_USERS($KEY_USER_ID)
             )
         """.trimIndent()
 
@@ -154,7 +162,8 @@ class GuildBoardDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
                 $KEY_GC_SENDER TEXT,
                 $KEY_GC_TEXT TEXT,
                 $KEY_GC_TIME TEXT,
-                $KEY_GC_SYSTEM INTEGER DEFAULT 0
+                $KEY_GC_SYSTEM INTEGER DEFAULT 0,
+                FOREIGN KEY ($KEY_GC_GUILD_ID) REFERENCES $TABLE_GUILDS($KEY_GUILD_ID)
             )
         """.trimIndent()
 
@@ -163,7 +172,8 @@ class GuildBoardDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
                 $KEY_GG_ID INTEGER PRIMARY KEY AUTOINCREMENT,
                 $KEY_GG_GUILD_ID INTEGER,
                 $KEY_GG_TITLE TEXT NOT NULL,
-                $KEY_GG_CATEGORY TEXT
+                $KEY_GG_CATEGORY TEXT,
+                FOREIGN KEY ($KEY_GG_GUILD_ID) REFERENCES $TABLE_GUILDS($KEY_GUILD_ID)
             )
         """.trimIndent()
 
@@ -194,8 +204,10 @@ class GuildBoardDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         db.execSQL("INSERT INTO $TABLE_USERS ($KEY_USER_NICK, $KEY_USER_EMAIL, $KEY_USER_PASS, $KEY_USER_ROLE, $KEY_USER_CITY, $KEY_USER_DISTANCE, $KEY_USER_GAMES, $KEY_USER_GAMES_PLAYED, $KEY_USER_TABLES_ORG, $KEY_USER_RATING) VALUES ('Piotr_RPG', 'piotr@example.com', 'Password123', 'Mistrz Gry • Zaawansowany', 'Kraków', 'Kraków (2.5 km)', 'Nemesis, Gloomhaven, Brass Birmingham', 28, 12, 5.0)")
         db.execSQL("INSERT INTO $TABLE_USERS ($KEY_USER_NICK, $KEY_USER_EMAIL, $KEY_USER_PASS, $KEY_USER_ROLE, $KEY_USER_CITY, $KEY_USER_DISTANCE, $KEY_USER_GAMES, $KEY_USER_GAMES_PLAYED, $KEY_USER_TABLES_ORG, $KEY_USER_RATING) VALUES ('Ania_Boardgames', 'ania@example.com', 'Password123', 'Gracz • Średniozaawansowany', 'Kraków', 'Kraków (1.2 km)', 'Catan, Everdell, Wingspan', 8, 1, 4.8)")
 
-        db.execSQL("INSERT INTO $TABLE_EVENTS ($KEY_EVENT_TITLE, $KEY_EVENT_DESC, $KEY_EVENT_DIST, $KEY_EVENT_CURR_SEATS, $KEY_EVENT_MAX_SEATS, $KEY_EVENT_CATEGORY) VALUES ('Nemesis Lockdown', 'Surwiwal horror z figurkami. Szukamy 2 doświadczonych graczy.', 3.2, 3, 5, 'Planszówki')")
-        db.execSQL("INSERT INTO $TABLE_EVENTS ($KEY_EVENT_TITLE, $KEY_EVENT_DESC, $KEY_EVENT_DIST, $KEY_EVENT_CURR_SEATS, $KEY_EVENT_MAX_SEATS, $KEY_EVENT_CATEGORY) VALUES ('Catan: Miasta i Rycerze', 'Szybka rozgrywka dla każdego. Zapewniamy przekąski!', 1.5, 2, 4, 'Planszówki')")
+        // Powiązanie stołów z użytkownikami (Jan_Gracz - 1, Piotr_RPG - 2, Ania_Boardgames - 3)
+        db.execSQL("INSERT INTO $TABLE_EVENTS ($KEY_EVENT_TITLE, $KEY_EVENT_DESC, $KEY_EVENT_DIST, $KEY_EVENT_CURR_SEATS, $KEY_EVENT_MAX_SEATS, $KEY_EVENT_CATEGORY, $KEY_EVENT_ORGANIZER_ID, $KEY_EVENT_ORGANIZER_NICK) VALUES ('Nemesis Lockdown', 'Surwiwal horror z figurkami. Szukamy 2 doświadczonych graczy.', 3.2, 3, 5, 'Planszówki', 1, 'Jan_Gracz')")
+        db.execSQL("INSERT INTO $TABLE_EVENTS ($KEY_EVENT_TITLE, $KEY_EVENT_DESC, $KEY_EVENT_DIST, $KEY_EVENT_CURR_SEATS, $KEY_EVENT_MAX_SEATS, $KEY_EVENT_CATEGORY, $KEY_EVENT_ORGANIZER_ID, $KEY_EVENT_ORGANIZER_NICK) VALUES ('Catan: Miasta i Rycerze', 'Szybka rozgrywka dla każdego. Zapewniamy przekąski!', 1.5, 2, 4, 'Planszówki', 3, 'Ania_Boardgames')")
+        db.execSQL("INSERT INTO $TABLE_EVENTS ($KEY_EVENT_TITLE, $KEY_EVENT_DESC, $KEY_EVENT_DIST, $KEY_EVENT_CURR_SEATS, $KEY_EVENT_MAX_SEATS, $KEY_EVENT_CATEGORY, $KEY_EVENT_ORGANIZER_ID, $KEY_EVENT_ORGANIZER_NICK) VALUES ('Dungeons & Dragons 5e - Klątwa Strahda', 'Mroczna kampania RPG. Szukamy gracza do stałej grupy.', 5.0, 4, 5, 'Sesje RPG', 2, 'Piotr_RPG')")
 
         db.execSQL("INSERT INTO $TABLE_MESSAGES ($KEY_MSG_EVENT_ID, $KEY_MSG_SENDER, $KEY_MSG_TEXT, $KEY_MSG_TIME, $KEY_MSG_SYSTEM) VALUES (1, 'System', 'Połączono ze stolikiem: Nemesis Lockdown', '17:00', 1)")
 
@@ -213,17 +225,41 @@ class GuildBoardDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         // Czat Gildii 1
         db.execSQL("INSERT INTO $TABLE_GUILD_CHAT ($KEY_GC_GUILD_ID, $KEY_GC_SENDER, $KEY_GC_TEXT, $KEY_GC_TIME, $KEY_GC_SYSTEM) VALUES (1, 'System', 'Witaj na czacie Krakowskiej Gildii Planszówkowej!', '12:00', 1)")
         db.execSQL("INSERT INTO $TABLE_GUILD_CHAT ($KEY_GC_GUILD_ID, $KEY_GC_SENDER, $KEY_GC_TEXT, $KEY_GC_TIME, $KEY_GC_SYSTEM) VALUES (1, 'Jan_Gracz', 'Cześć wszystkim! Co przynosicie na najbliższe spotkanie?', '12:05', 0)")
-        db.execSQL("INSERT INTO $TABLE_GUILD_CHAT ($KEY_GC_GUILD_ID, $KEY_GC_SENDER, $KEY_GC_TEXT, $KEY_GC_TIME, $KEY_GC_SYSTEM) VALUES (1, 'Ania_Boardgames', 'Siema! Wezmę Everdell i Catan z dodatkami.', '12:10', 0)")
 
         // Gry Gildii 1
         db.execSQL("INSERT INTO $TABLE_GUILD_GAMES ($KEY_GG_GUILD_ID, $KEY_GG_TITLE, $KEY_GG_CATEGORY) VALUES (1, 'Catan: Miasta i Rycerze', 'Planszówki')")
         db.execSQL("INSERT INTO $TABLE_GUILD_GAMES ($KEY_GG_GUILD_ID, $KEY_GG_TITLE, $KEY_GG_CATEGORY) VALUES (1, 'Nemesis Lockdown', 'Planszówki')")
-        db.execSQL("INSERT INTO $TABLE_GUILD_GAMES ($KEY_GG_GUILD_ID, $KEY_GG_TITLE, $KEY_GG_CATEGORY) VALUES (1, 'Terraforming Mars', 'Planszówki')")
-        db.execSQL("INSERT INTO $TABLE_GUILD_GAMES ($KEY_GG_GUILD_ID, $KEY_GG_TITLE, $KEY_GG_CATEGORY) VALUES (1, 'Everdell', 'Planszówki')")
+    }
 
-        // Gry Gildii 2
-        db.execSQL("INSERT INTO $TABLE_GUILD_GAMES ($KEY_GG_GUILD_ID, $KEY_GG_TITLE, $KEY_GG_CATEGORY) VALUES (2, 'Dungeons & Dragons 5e', 'RPG')")
-        db.execSQL("INSERT INTO $TABLE_GUILD_GAMES ($KEY_GG_GUILD_ID, $KEY_GG_TITLE, $KEY_GG_CATEGORY) VALUES (2, 'Call of Cthulhu', 'RPG')")
+    // --- METODY DLA STOŁÓW / WYDARZEŃ ---
+    fun getAllGameEvents(): List<GameEvent> {
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM $TABLE_EVENTS", null)
+        val list = mutableListOf<GameEvent>()
+        while (cursor.moveToNext()) {
+            val id = cursor.getLong(cursor.getColumnIndexOrThrow(KEY_EVENT_ID)).toString()
+            val title = cursor.getString(cursor.getColumnIndexOrThrow(KEY_EVENT_TITLE))
+            val desc = cursor.getString(cursor.getColumnIndexOrThrow(KEY_EVENT_DESC))
+            val dist = cursor.getDouble(cursor.getColumnIndexOrThrow(KEY_EVENT_DIST))
+            val currSeats = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_EVENT_CURR_SEATS))
+            val maxSeats = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_EVENT_MAX_SEATS))
+            val category = cursor.getString(cursor.getColumnIndexOrThrow(KEY_EVENT_CATEGORY))
+            val orgId = cursor.getLong(cursor.getColumnIndexOrThrow(KEY_EVENT_ORGANIZER_ID))
+            val orgNick = cursor.getString(cursor.getColumnIndexOrThrow(KEY_EVENT_ORGANIZER_NICK)) ?: "Jan_Gracz"
+            val joined = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_EVENT_JOINED)) == 1
+
+            list.add(GameEvent(id, title, desc, dist, currSeats, maxSeats, category, joined, orgId, orgNick))
+        }
+        cursor.close()
+        return list
+    }
+
+    fun updateEventJoinedStatus(eventId: String, isJoined: Boolean) {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put(KEY_EVENT_JOINED, if (isJoined) 1 else 0)
+        }
+        db.update(TABLE_EVENTS, values, "$KEY_EVENT_ID = ?", arrayOf(eventId))
     }
 
     // --- SPRAWDZENIE GILDII UŻYTKOWNIKA ---
@@ -274,15 +310,12 @@ class GuildBoardDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         val db = writableDatabase
         db.beginTransaction()
         try {
-            // 1. Zmień rolę starego właściciela na MEMBER
             val valuesOldOwner = ContentValues().apply { put(KEY_GM_ROLE, "MEMBER") }
             db.update(TABLE_GUILD_MEMBERS, valuesOldOwner, "$KEY_GM_GUILD_ID = ? AND $KEY_GM_USER_ID = ?", arrayOf(guildId.toString(), currentOwnerUserId.toString()))
 
-            // 2. Zmień rolę nowego właściciela na OWNER
             val valuesNewOwner = ContentValues().apply { put(KEY_GM_ROLE, "OWNER") }
             db.update(TABLE_GUILD_MEMBERS, valuesNewOwner, "$KEY_GM_ID = ?", arrayOf(newOwnerMemberId.toString()))
 
-            // 3. Zaktualizuj dane właściciela w tabeli guilds
             val valuesGuild = ContentValues().apply {
                 put(KEY_GUILD_OWNER_ID, newOwnerUserId)
                 put(KEY_GUILD_OWNER_NICK, newOwnerNick)
@@ -359,14 +392,12 @@ class GuildBoardDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         val role = getUserGuildRole(guildId, userId)
 
         if (role == "OWNER") {
-            // Rozwiązanie całej gildii jeśli wychodzi Właściciel
             db.delete(TABLE_GUILDS, "$KEY_GUILD_ID = ?", arrayOf(guildId.toString()))
             db.delete(TABLE_GUILD_MEMBERS, "$KEY_GM_GUILD_ID = ?", arrayOf(guildId.toString()))
             db.delete(TABLE_GUILD_CHAT, "$KEY_GC_GUILD_ID = ?", arrayOf(guildId.toString()))
             db.delete(TABLE_GUILD_GAMES, "$KEY_GG_GUILD_ID = ?", arrayOf(guildId.toString()))
             return true
         } else {
-            // Zwykłe opuszczenie gildii przez Członka
             val rows = db.delete(TABLE_GUILD_MEMBERS, "$KEY_GM_GUILD_ID = ? AND $KEY_GM_USER_ID = ?", arrayOf(guildId.toString(), userId.toString()))
             if (rows > 0) {
                 db.execSQL("UPDATE $TABLE_GUILDS SET $KEY_GUILD_MEMBER_COUNT = MAX(1, $KEY_GUILD_MEMBER_COUNT - 1) WHERE $KEY_GUILD_ID = $guildId")
@@ -588,34 +619,6 @@ class GuildBoardDbHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         val db = writableDatabase
         db.delete(TABLE_GUILD_MEMBERS, "$KEY_GM_ID = ?", arrayOf(memberId.toString()))
         db.execSQL("UPDATE $TABLE_GUILDS SET $KEY_GUILD_MEMBER_COUNT = MAX(1, $KEY_GUILD_MEMBER_COUNT - 1) WHERE $KEY_GUILD_ID = $guildId")
-    }
-
-    fun getAllGameEvents(): List<GameEvent> {
-        val db = readableDatabase
-        val cursor = db.rawQuery("SELECT * FROM $TABLE_EVENTS", null)
-        val list = mutableListOf<GameEvent>()
-        while (cursor.moveToNext()) {
-            val id = cursor.getLong(cursor.getColumnIndexOrThrow(KEY_EVENT_ID)).toString()
-            val title = cursor.getString(cursor.getColumnIndexOrThrow(KEY_EVENT_TITLE))
-            val desc = cursor.getString(cursor.getColumnIndexOrThrow(KEY_EVENT_DESC))
-            val dist = cursor.getDouble(cursor.getColumnIndexOrThrow(KEY_EVENT_DIST))
-            val currSeats = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_EVENT_CURR_SEATS))
-            val maxSeats = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_EVENT_MAX_SEATS))
-            val category = cursor.getString(cursor.getColumnIndexOrThrow(KEY_EVENT_CATEGORY))
-            val joined = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_EVENT_JOINED)) == 1
-
-            list.add(GameEvent(id, title, desc, dist, currSeats, maxSeats, category, joined))
-        }
-        cursor.close()
-        return list
-    }
-
-    fun updateEventJoinedStatus(eventId: String, isJoined: Boolean) {
-        val db = writableDatabase
-        val values = ContentValues().apply {
-            put(KEY_EVENT_JOINED, if (isJoined) 1 else 0)
-        }
-        db.update(TABLE_EVENTS, values, "$KEY_EVENT_ID = ?", arrayOf(eventId))
     }
 
     fun getChatMessages(eventId: Int = 1): List<ChatMessage> {
