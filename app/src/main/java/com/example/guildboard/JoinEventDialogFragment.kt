@@ -89,7 +89,7 @@ class JoinEventDialogFragment : DialogFragment() {
             dbHelper.joinOrUpdateEventParticipant(eventId, currentUser.id, role, commitment)
             Toast.makeText(requireContext(), "Zapisano Twój status w wydarzeniu!", Toast.LENGTH_SHORT).show()
 
-            (parentFragmentManager.fragments.find { it is GamesListFragment } as? GamesListFragment)?.refreshEvents()
+            (parentFragment as? GamesListFragment)?.refreshEvents()
             dismiss()
         }
 

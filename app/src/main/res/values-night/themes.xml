@@ -12,5 +12,9 @@
 
         <item name="popupTheme">@style/CustomPopupMenuTheme</item>
         <item name="android:popupTheme">@style/CustomPopupMenuTheme</item>
+
+        <!-- DatePicker / TimePicker styles -->
+        <item name="android:datePickerDialogTheme">@style/CustomPickerTheme</item>
+        <item name="android:timePickerDialogTheme">@style/CustomPickerTheme</item>
     </style>
 </resources>

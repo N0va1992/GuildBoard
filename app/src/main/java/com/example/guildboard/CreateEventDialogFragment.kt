@@ -1,6 +1,8 @@
 package com.example.guildboard
 
 import android.app.Dialog
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +12,8 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
+import java.util.Calendar
+import java.util.Locale
 
 class CreateEventDialogFragment : DialogFragment() {
 
@@ -41,6 +45,12 @@ class CreateEventDialogFragment : DialogFragment() {
 
         tvCancel.setOnClickListener { dismiss() }
 
+        etDateTime.isFocusable = false
+        etDateTime.isClickable = true
+        etDateTime.setOnClickListener {
+            showDateTimePicker()
+        }
+
         btnCreate.setOnClickListener {
             val mainActivity = activity as? MainActivity
             val currentUser = mainActivity?.getCurrentUser()
@@ -68,7 +78,7 @@ class CreateEventDialogFragment : DialogFragment() {
 
             if (eventId > 0) {
                 Toast.makeText(requireContext(), "Utworzono spotkanie: $title", Toast.LENGTH_SHORT).show()
-                (parentFragmentManager.fragments.find { it is GamesListFragment } as? GamesListFragment)?.refreshEvents()
+                (parentFragment as? GamesListFragment)?.refreshEvents()
                 dismiss()
             } else {
                 Toast.makeText(requireContext(), "Błąd podczas tworzenia wydarzenia.", Toast.LENGTH_SHORT).show()
@@ -76,6 +86,30 @@ class CreateEventDialogFragment : DialogFragment() {
         }
 
         return view
+    }
+
+    private fun showDateTimePicker() {
+        val currentDate = Calendar.getInstance()
+        val year = currentDate.get(Calendar.YEAR)
+        val month = currentDate.get(Calendar.MONTH)
+        val day = currentDate.get(Calendar.DAY_OF_MONTH)
+        val hour = currentDate.get(Calendar.HOUR_OF_DAY)
+        val minute = currentDate.get(Calendar.MINUTE)
+
+        DatePickerDialog(requireContext(), { _, selectedYear, selectedMonth, selectedDay ->
+            TimePickerDialog(requireContext(), { _, selectedHour, selectedMinute ->
+                val formattedDateTime = String.format(
+                    Locale.getDefault(),
+                    "%04d-%02d-%02d %02d:%02d",
+                    selectedYear,
+                    selectedMonth + 1,
+                    selectedDay,
+                    selectedHour,
+                    selectedMinute
+                )
+                etDateTime.setText(formattedDateTime)
+            }, hour, minute, true).show()
+        }, year, month, day).show()
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
