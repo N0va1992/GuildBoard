@@ -88,43 +88,36 @@ class GuildsFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_guilds, container, false)
         dbHelper = (activity as? MainActivity)?.getDbHelper() ?: GuildBoardDbHelper(requireContext())
 
-        // Inicjalizacja Widoku 1
         layoutBrowseGuilds = view.findViewById(R.id.layoutBrowseGuilds)
         btnCreateGuild = view.findViewById(R.id.btnCreateGuild)
         etSearch = view.findViewById(R.id.etSearchGuild)
         rvGuilds = view.findViewById(R.id.rvGuilds)
 
-        // Inicjalizacja Widoku 2
         layoutMyGuild = view.findViewById(R.id.layoutMyGuild)
         tvMyGuildName = view.findViewById(R.id.tvMyGuildName)
         tvMyGuildRoleAndMeta = view.findViewById(R.id.tvMyGuildRoleAndMeta)
         btnBrowseAllGuilds = view.findViewById(R.id.btnBrowseAllGuilds)
         btnLeaveGuild = view.findViewById(R.id.btnLeaveGuild)
 
-        // Chipy
         chipGuildChat = view.findViewById(R.id.chipGuildChat)
         chipGuildMembers = view.findViewById(R.id.chipGuildMembers)
         chipGuildGames = view.findViewById(R.id.chipGuildGames)
         chipGuildManage = view.findViewById(R.id.chipGuildManage)
 
-        // Sekcje
         secGuildChat = view.findViewById(R.id.secGuildChat)
         secGuildMembers = view.findViewById(R.id.secGuildMembers)
         secGuildGames = view.findViewById(R.id.secGuildGames)
         secGuildManage = view.findViewById(R.id.secGuildManage)
 
-        // Czat
         rvGuildChatMessages = view.findViewById(R.id.rvGuildChatMessages)
         etGuildMessageInput = view.findViewById(R.id.etGuildMessageInput)
         btnSendGuildMessage = view.findViewById(R.id.btnSendGuildMessage)
 
-        // Członkowie i Gry
         rvMyGuildMembers = view.findViewById(R.id.rvMyGuildMembers)
         etAddGuildGame = view.findViewById(R.id.etAddGuildGame)
         btnAddGuildGame = view.findViewById(R.id.btnAddGuildGame)
         rvGuildGames = view.findViewById(R.id.rvGuildGames)
 
-        // Zarządzanie
         rvPendingMembers = view.findViewById(R.id.rvPendingMembers)
         rvManageMembers = view.findViewById(R.id.rvManageMembers)
 
@@ -148,7 +141,6 @@ class GuildsFragment : Fragment() {
         if (currentUser != null) {
             myGuild = dbHelper.getUserGuild(currentUser.id)
             if (myGuild != null && !isViewingBrowseMode) {
-                // Przekierowanie na stronę Mojej Gildii
                 showMyGuildPage(myGuild!!, currentUser)
                 return
             }
@@ -199,7 +191,6 @@ class GuildsFragment : Fragment() {
     }
 
     private fun setupMyGuildSubSections(guild: Guild, currentUser: User, userRole: String) {
-        // 1. Czat Gildii
         val chatMessages = dbHelper.getGuildChatMessages(guild.id).toMutableList()
         guildChatAdapter = ChatAdapter(chatMessages)
         val chatLayoutManager = LinearLayoutManager(requireContext())
@@ -211,17 +202,16 @@ class GuildsFragment : Fragment() {
             val text = etGuildMessageInput.text.toString().trim()
             if (text.isNotEmpty()) {
                 val timeNow = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-                val newMsg = ChatMessage(currentUser.nickname, timeNow, text)
-                dbHelper.addGuildChatMessage(guild.id, newMsg)
+                val newMsg = ChatMessage(currentUser.nickname, timeNow, text, false)
+                dbHelper.addGuildChatMessage(guild.id, currentUser.id, text)
                 guildChatAdapter.addMessage(newMsg)
                 etGuildMessageInput.setText("")
                 rvGuildChatMessages.smoothScrollToPosition(guildChatAdapter.itemCount - 1)
             }
         }
 
-        // 2. Członkowie Gildii
         val members = dbHelper.getGuildMembers(guild.id)
-        val acceptedMembers = members.filter { it.status == "ACCEPTED" }
+        val acceptedMembers = members.filter { it.status == "ACTIVE" }
 
         myGuildMembersAdapter = GuildMemberAdapter(acceptedMembers, userRole, currentUser.id) { member, view ->
             showMemberActionMenu(guild, member, view, userRole, currentUser)
@@ -229,7 +219,6 @@ class GuildsFragment : Fragment() {
         rvMyGuildMembers.layoutManager = LinearLayoutManager(requireContext())
         rvMyGuildMembers.adapter = myGuildMembersAdapter
 
-        // 3. Gry Gildii
         val games = dbHelper.getGuildGames(guild.id).toMutableList()
         guildGameAdapter = GuildGameAdapter(games)
         rvGuildGames.layoutManager = LinearLayoutManager(requireContext())
@@ -240,14 +229,13 @@ class GuildsFragment : Fragment() {
             if (gameTitle.isNotEmpty()) {
                 val newGameId = dbHelper.addGuildGame(guild.id, gameTitle)
                 if (newGameId > 0) {
-                    guildGameAdapter.addGame(GuildGame(newGameId, guild.id, gameTitle))
+                    guildGameAdapter.addGame(GuildGame(newGameId, guild.id, gameTitle, "Planszówki"))
                     etAddGuildGame.setText("")
                     Toast.makeText(requireContext(), "Dodano grę: $gameTitle", Toast.LENGTH_SHORT).show()
                 }
             }
         }
 
-        // 4. Sekcja Zarządzania i Prośby (dla Ownera/Moderatora)
         val isOwnerOrMod = userRole == "OWNER" || userRole == "MODERATOR"
         if (isOwnerOrMod) {
             val pendingMembers = members.filter { it.status == "PENDING" }
@@ -297,11 +285,9 @@ class GuildsFragment : Fragment() {
         val popup = PopupMenu(wrapper, anchorView)
 
         if (member.status == "PENDING") {
-            // Zarówno Właściciel jak i Moderator mogą akceptować/odrzucać dołączenie
             popup.menu.add("Zaakceptuj prośbę o dołączenie")
             popup.menu.add("Odrzuć prośbę")
         } else {
-            // Właściciel ma pełne zarządzenie rolami i przekazywaniem własności
             if (currentUserRole == "OWNER") {
                 if (member.role == "MEMBER") {
                     popup.menu.add("Nadaj rolę Moderatora")
@@ -312,14 +298,12 @@ class GuildsFragment : Fragment() {
                 }
                 popup.menu.add("Usuń z gildii")
             } else if (currentUserRole == "MODERATOR") {
-                // Moderator może usuwać TYLKO zwykłych członków (MEMBER)
                 if (member.role == "MEMBER") {
                     popup.menu.add("Usuń z gildii")
                 }
             }
         }
 
-        // Formatowanie koloru liter w menu akcji (kontrastowy biały tekst)
         for (i in 0 until popup.menu.size()) {
             val item = popup.menu.getItem(i)
             val span = SpannableString(item.title)
@@ -330,25 +314,25 @@ class GuildsFragment : Fragment() {
         popup.setOnMenuItemClickListener { item ->
             when (item.title.toString()) {
                 "Zaakceptuj prośbę o dołączenie" -> {
-                    dbHelper.updateGuildMemberStatus(guild.id, member.id, "ACCEPTED")
+                    dbHelper.updateGuildMemberStatus(guild.id, member.userId, "active")
                     Toast.makeText(requireContext(), "Zaakceptowano użytkownika ${member.userNick}", Toast.LENGTH_SHORT).show()
                     checkUserGuildState()
                     true
                 }
                 "Odrzuć prośbę", "Usuń z gildii" -> {
-                    dbHelper.removeGuildMember(guild.id, member.id)
+                    dbHelper.removeGuildMember(guild.id, member.userId)
                     Toast.makeText(requireContext(), "Usunięto użytkownika ${member.userNick}", Toast.LENGTH_SHORT).show()
                     checkUserGuildState()
                     true
                 }
                 "Nadaj rolę Moderatora" -> {
-                    dbHelper.updateGuildMemberRole(member.id, "MODERATOR")
+                    dbHelper.updateGuildMemberRole(guild.id, member.userId, "moderator")
                     Toast.makeText(requireContext(), "Nadano rolę Moderatora dla ${member.userNick}", Toast.LENGTH_SHORT).show()
                     checkUserGuildState()
                     true
                 }
                 "Odbierz rolę Moderatora" -> {
-                    dbHelper.updateGuildMemberRole(member.id, "MEMBER")
+                    dbHelper.updateGuildMemberRole(guild.id, member.userId, "member")
                     Toast.makeText(requireContext(), "Odebrano rolę Moderatora dla ${member.userNick}", Toast.LENGTH_SHORT).show()
                     checkUserGuildState()
                     true
@@ -356,10 +340,7 @@ class GuildsFragment : Fragment() {
                 "Przekaż rolę Właściciela" -> {
                     val success = dbHelper.transferGuildOwnership(
                         guildId = guild.id,
-                        currentOwnerUserId = currentUser.id,
-                        newOwnerMemberId = member.id,
-                        newOwnerUserId = member.userId,
-                        newOwnerNick = member.userNick
+                        newOwnerUserId = member.userId
                     )
                     if (success) {
                         Toast.makeText(requireContext(), "Przekazano rolę Właściciela dla ${member.userNick}. Jesteś teraz Członkiem.", Toast.LENGTH_LONG).show()
@@ -437,11 +418,11 @@ class GuildsFragment : Fragment() {
                     Toast.makeText(requireContext(), "Zaloguj się, aby dołączyć do gildii!", Toast.LENGTH_SHORT).show()
                     mainActivity?.showLoginDialog()
                 } else {
-                    val status = dbHelper.joinGuild(guild.id, currentUser.id, currentUser.nickname, guild.requiresApproval)
+                    val status = dbHelper.joinGuild(guild.id, currentUser.id, guild.requiresApproval)
                     if (status == "ALREADY_IN_GUILD") {
                         val currentG = dbHelper.getUserGuild(currentUser.id)
                         Toast.makeText(requireContext(), "Należysz już do gildii \"${currentG?.name}\"! Możesz należeć tylko do 1 gildii.", Toast.LENGTH_LONG).show()
-                    } else if (status == "ACCEPTED") {
+                    } else if (status == "ACTIVE") {
                         Toast.makeText(requireContext(), "Dołączono do gildii ${guild.name}!", Toast.LENGTH_SHORT).show()
                         isViewingBrowseMode = false
                         checkUserGuildState()

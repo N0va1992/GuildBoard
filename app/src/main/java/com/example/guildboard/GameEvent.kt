@@ -10,5 +10,10 @@ data class GameEvent(
     val category: String,
     var isJoined: Boolean = false,
     val organizerId: Long = 1,
-    val organizerNick: String = "Jan_Gracz"
+    val organizerNick: String = "Jan_Gracz",
+    val city: String = "",
+    val address: String = "",
+    val startsAt: String = "",
+    val userCommitment: String = "",
+    val userEventRole: String = ""
 )

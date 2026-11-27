@@ -75,8 +75,13 @@ class CreateGuildDialogFragment : DialogFragment() {
             if (guildId > 0) {
                 Toast.makeText(requireContext(), "Stworzono gildię: $name!", Toast.LENGTH_SHORT).show()
                 dismiss()
-                // Send callback or refresh
-                (targetFragment as? GuildsFragment)?.loadGuilds()
+                // Refresh list
+                val guildsFragment = parentFragment as? GuildsFragment
+                if (guildsFragment != null) {
+                    guildsFragment.loadGuilds()
+                    // Reload resume state to jump to "My Guild" page
+                    guildsFragment.onResume()
+                }
             } else {
                 Toast.makeText(requireContext(), "Błąd tworzenia gildii.", Toast.LENGTH_SHORT).show()
             }

@@ -31,6 +31,7 @@ class ChatFragment : Fragment() {
     private lateinit var dbHelper: GuildBoardDbHelper
 
     private var messagesList: MutableList<ChatMessage> = mutableListOf()
+    private val CURRENT_EVENT_ID = 1
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -79,7 +80,7 @@ class ChatFragment : Fragment() {
     }
 
     private fun loadMessagesFromDb() {
-        messagesList = dbHelper.getChatMessages(eventId = 1).toMutableList()
+        messagesList = dbHelper.getChatMessages(eventId = CURRENT_EVENT_ID).toMutableList()
     }
 
     private fun setupRecyclerView() {
@@ -93,19 +94,21 @@ class ChatFragment : Fragment() {
     private fun setupSendButton() {
         btnSend.setOnClickListener {
             val text = etMessageInput.text.toString().trim()
-            if (text.isNotEmpty()) {
+            val currentUser = (activity as? MainActivity)?.getCurrentUser()
+            
+            if (currentUser != null && text.isNotEmpty()) {
                 val timeNow = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-                val userNick = (activity as? MainActivity)?.getCurrentUserNick() ?: "Jan_Gracz (Ty)"
+                val newMessage = ChatMessage(currentUser.nickname, timeNow, text, false)
 
-                val newMessage = ChatMessage(userNick, timeNow, text)
-
-                dbHelper.addChatMessage(eventId = 1, newMessage)
+                dbHelper.addChatMessage(CURRENT_EVENT_ID, currentUser.id, text)
                 adapter.addMessage(newMessage)
 
                 etMessageInput.setText("")
                 rvMessages.smoothScrollToPosition(adapter.itemCount - 1)
-            } else {
+            } else if (text.isEmpty()) {
                 Toast.makeText(requireContext(), "Wpisz wiadomość...", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(requireContext(), "Zaloguj się aby wysłać", Toast.LENGTH_SHORT).show()
             }
         }
     }

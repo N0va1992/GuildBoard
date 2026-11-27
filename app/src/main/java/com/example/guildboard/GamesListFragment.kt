@@ -6,6 +6,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
@@ -18,6 +19,7 @@ class GamesListFragment : Fragment() {
 
     private lateinit var rvEvents: RecyclerView
     private lateinit var etSearch: EditText
+    private lateinit var btnCreateEvent: Button
     private lateinit var adapter: EventAdapter
     private lateinit var dbHelper: GuildBoardDbHelper
 
@@ -34,6 +36,19 @@ class GamesListFragment : Fragment() {
         dbHelper = (activity as? MainActivity)?.getDbHelper() ?: GuildBoardDbHelper(requireContext())
         rvEvents = view.findViewById(R.id.rvGameEvents)
         etSearch = view.findViewById(R.id.etSearchGame)
+        btnCreateEvent = view.findViewById(R.id.btnCreateEvent)
+
+        val currentUser = (activity as? MainActivity)?.getCurrentUser()
+        if (currentUser != null && (currentUser.roleAndLevel.contains("Organizator", ignoreCase = true) || currentUser.roleAndLevel.contains("Mistrz Gry", ignoreCase = true))) {
+            btnCreateEvent.visibility = View.VISIBLE
+        } else {
+            btnCreateEvent.visibility = View.GONE
+        }
+
+        btnCreateEvent.setOnClickListener {
+            val dialog = CreateEventDialogFragment.newInstance()
+            dialog.show(childFragmentManager, CreateEventDialogFragment.TAG)
+        }
 
         loadDataFromDatabase()
         setupRecyclerView()
@@ -43,22 +58,51 @@ class GamesListFragment : Fragment() {
         return view
     }
 
+    override fun onResume() {
+        super.onResume()
+        refreshEvents()
+    }
+
+    fun refreshEvents() {
+        loadDataFromDatabase()
+        if (::adapter.isInitialized) {
+            adapter.updateEvents(allEvents)
+        }
+    }
+
     private fun loadDataFromDatabase() {
-        allEvents = dbHelper.getAllGameEvents().toMutableList()
+        val currentUser = (activity as? MainActivity)?.getCurrentUser()
+        allEvents = dbHelper.getAllGameEvents(currentUser?.id).toMutableList()
     }
 
     private fun setupRecyclerView() {
         adapter = EventAdapter(
             events = allEvents,
             onJoinClick = { event ->
-                event.isJoined = true
-                dbHelper.updateEventJoinedStatus(event.id, true)
-                adapter.notifyDataSetChanged()
-                Toast.makeText(requireContext(), "Wysłano prośbę dołączenia do: ${event.title}", Toast.LENGTH_SHORT).show()
+                val mainActivity = activity as? MainActivity
+                val currentUser = mainActivity?.getCurrentUser()
+                if (currentUser != null) {
+                    val dialog = JoinEventDialogFragment.newInstance(
+                        id = event.id.toLong(),
+                        title = event.title,
+                        role = event.userEventRole,
+                        commitment = event.userCommitment
+                    )
+                    dialog.show(childFragmentManager, JoinEventDialogFragment.TAG)
+                } else {
+                    Toast.makeText(requireContext(), "Musisz się zalogować, aby dołączyć do gry!", Toast.LENGTH_SHORT).show()
+                    mainActivity?.showLoginDialog()
+                }
             },
             onOpenChatClick = { event ->
-                Toast.makeText(requireContext(), "Otwieranie czatu dla: ${event.title}", Toast.LENGTH_SHORT).show()
-                (activity as? MainActivity)?.selectChatTab()
+                val mainActivity = activity as? MainActivity
+                if (mainActivity?.isUserLoggedIn() == true) {
+                    Toast.makeText(requireContext(), "Otwieranie czatu dla: ${event.title}", Toast.LENGTH_SHORT).show()
+                    mainActivity.selectChatTab()
+                } else {
+                    Toast.makeText(requireContext(), "Czat dostępny tylko dla zalogowanych.", Toast.LENGTH_SHORT).show()
+                    mainActivity?.showLoginDialog()
+                }
             }
         )
 

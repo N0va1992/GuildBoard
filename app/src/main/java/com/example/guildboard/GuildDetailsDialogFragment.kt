@@ -80,7 +80,7 @@ class GuildDetailsDialogFragment : DialogFragment() {
             currentUserId = currentUser?.id ?: 0,
             onActionClick = { member, anchorView ->
                 if (currentUser != null) {
-                    showMemberActionMenu(member, anchorView, userRole, currentUser)
+                    showMemberActionMenu(member, anchorView, userRole)
                 }
             }
         )
@@ -89,7 +89,7 @@ class GuildDetailsDialogFragment : DialogFragment() {
         rvMembers.adapter = adapter
     }
 
-    private fun showMemberActionMenu(member: GuildMember, anchorView: View, currentUserRole: String, currentUser: User) {
+    private fun showMemberActionMenu(member: GuildMember, anchorView: View, currentUserRole: String) {
         val wrapper = ContextThemeWrapper(requireContext(), R.style.CustomPopupMenuTheme)
         val popup = PopupMenu(wrapper, anchorView)
 
@@ -123,25 +123,25 @@ class GuildDetailsDialogFragment : DialogFragment() {
         popup.setOnMenuItemClickListener { item ->
             when (item.title.toString()) {
                 "Zaakceptuj prośbę o dołączenie" -> {
-                    dbHelper.updateGuildMemberStatus(guildId, member.id, "ACCEPTED")
+                    dbHelper.updateGuildMemberStatus(guildId, member.userId, "active")
                     Toast.makeText(requireContext(), "Zaakceptowano użytkownika ${member.userNick}", Toast.LENGTH_SHORT).show()
                     setupMembersList()
                     true
                 }
                 "Odrzuć prośbę", "Usuń z gildii" -> {
-                    dbHelper.removeGuildMember(guildId, member.id)
+                    dbHelper.removeGuildMember(guildId, member.userId)
                     Toast.makeText(requireContext(), "Usunięto użytkownika ${member.userNick}", Toast.LENGTH_SHORT).show()
                     setupMembersList()
                     true
                 }
                 "Nadaj rolę Moderatora" -> {
-                    dbHelper.updateGuildMemberRole(member.id, "MODERATOR")
+                    dbHelper.updateGuildMemberRole(guildId, member.userId, "moderator")
                     Toast.makeText(requireContext(), "Nadano rolę Moderatora dla ${member.userNick}", Toast.LENGTH_SHORT).show()
                     setupMembersList()
                     true
                 }
                 "Odbierz rolę Moderatora" -> {
-                    dbHelper.updateGuildMemberRole(member.id, "MEMBER")
+                    dbHelper.updateGuildMemberRole(guildId, member.userId, "member")
                     Toast.makeText(requireContext(), "Odebrano rolę Moderatora dla ${member.userNick}", Toast.LENGTH_SHORT).show()
                     setupMembersList()
                     true
@@ -149,10 +149,7 @@ class GuildDetailsDialogFragment : DialogFragment() {
                 "Przekaż rolę Właściciela" -> {
                     val success = dbHelper.transferGuildOwnership(
                         guildId = guildId,
-                        currentOwnerUserId = currentUser.id,
-                        newOwnerMemberId = member.id,
-                        newOwnerUserId = member.userId,
-                        newOwnerNick = member.userNick
+                        newOwnerUserId = member.userId
                     )
                     if (success) {
                         Toast.makeText(requireContext(), "Przekazano rolę Właściciela dla ${member.userNick}.", Toast.LENGTH_LONG).show()

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/card_dark"
+    android:padding="20dp">
+
+    <TextView
+        android:id="@+id/tvJoinEventTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Dołącz: Nazwa Gry"
+        android:textColor="@color/accent_gold"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Wybierz swoją rolę na spotkaniu:"
+        android:textColor="@color/text_white"
+        android:textSize="14sp" />
+
+    <RadioGroup
+        android:id="@+id/rgRole"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp">
+
+        <RadioButton
+            android:id="@+id/rbRolePlayer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Gracz"
+            android:textColor="@color/text_white"
+            android:buttonTint="@color/accent_gold" />
+
+        <RadioButton
+            android:id="@+id/rbRoleGm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mistrz Gry (Prowadzący)"
+            android:textColor="@color/text_white"
+            android:buttonTint="@color/accent_gold" />
+    </RadioGroup>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Status Twojego uczestnictwa:"
+        android:textColor="@color/text_white"
+        android:textSize="14sp" />
+
+    <RadioGroup
+        android:id="@+id/rgCommitment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp">
+
+        <RadioButton
+            android:id="@+id/rbCommSure"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Będę na pewno"
+            android:textColor="@color/accent_green"
+            android:buttonTint="@color/accent_gold" />
+
+        <RadioButton
+            android:id="@+id/rbCommMaybe"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Może będę"
+            android:textColor="@color/text_white"
+            android:buttonTint="@color/accent_gold" />
+
+        <RadioButton
+            android:id="@+id/rbCommObserver"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tylko obserwuję wydarzenie"
+            android:textColor="@color/text_muted"
+            android:buttonTint="@color/accent_gold" />
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/btnSaveJoin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:backgroundTint="@color/accent_gold"
+        android:text="Zapisz status"
+        android:textColor="@color/bg_dark"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvCloseJoin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="12dp"
+        android:padding="8dp"
+        android:text="Anuluj"
+        android:textColor="@color/text_muted"
+        android:textSize="13sp" />
+
+</LinearLayout>
